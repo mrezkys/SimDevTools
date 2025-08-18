@@ -19,18 +19,8 @@ struct ContentView: View {
                 NotificationView()
             case .storage:
                 StorageView()
-            case .permission:
-                PermissionView()
             case .location:
                 LocationView()
-            case .developer:
-                DeveloperView()
-            case .performance:
-                Text ("Performance not implemented yet")
-                    .resizeToContentFrame()
-            case .network:
-                Text ("Network not implemented yet")
-                    .resizeToContentFrame()
             }
         }
         .resizeToAppFrame()

@@ -11,11 +11,7 @@ enum SidebarMenuType {
     case setting
     case notification
     case storage
-    case permission
     case location
-    case developer
-    case performance
-    case network
 }
 
 struct SidebarView: View {
@@ -64,19 +60,7 @@ struct SidebarView: View {
                         )
                 }
                 .opacity(selectedMenu == .storage ? 1 : 0.3)
-                Button {
-                    selectedMenu = .permission
-                } label: {
-                    Image(systemName: "lock.square.stack")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(20)
-                        .frame(
-                            width: 64,
-                            height: 64
-                        )
-                }
-                .opacity(selectedMenu == .permission ? 1 : 0.3)
+                
                 Button {
                     selectedMenu = .location
                 } label: {
@@ -90,45 +74,6 @@ struct SidebarView: View {
                         )
                 }
                 .opacity(selectedMenu == .location ? 1 : 0.3)
-                Button {
-                    selectedMenu = .developer
-                } label: {
-                    Image(systemName: "swift")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(20)
-                        .frame(
-                            width: 64,
-                            height: 64
-                        )
-                }
-                .opacity(selectedMenu == .developer ? 1 : 0.3)
-                Button {
-                    selectedMenu = .network
-                } label: {
-                    Image(systemName: "wifi")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(20)
-                        .frame(
-                            width: 64,
-                            height: 64
-                        )
-                }
-                .opacity(selectedMenu == .network ? 1 : 0.3)
-                Button {
-                    selectedMenu = .performance
-                } label: {
-                    Image(systemName: "chart.bar.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(20)
-                        .frame(
-                            width: 64,
-                            height: 64
-                        )
-                }
-                .opacity(selectedMenu == .performance ? 1 : 0.3)
                 Spacer()
             }
             .frame(
