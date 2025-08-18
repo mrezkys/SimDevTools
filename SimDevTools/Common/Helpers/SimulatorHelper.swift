@@ -24,9 +24,15 @@ enum SimulatorHelperError: Error {
     }
 }
 
+struct CommandResultModel {
+    var stdOut: String;
+    var stdErr: String;
+    var status: Int32;
+    
+}
 
 struct SimulatorHelper {
-    static func getBootedSimulatorApps() -> Result<[String], SimulatorHelperError> {
+    static func execute(arguments: [String]) -> Result<CommandResultModel, SimulatorHelperError> {
         let devDir: String = {
             let p = Process(); let out = Pipe()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/xcode-select")
@@ -50,7 +56,7 @@ struct SimulatorHelper {
         let stderrPipe = Pipe()
         
         process.executableURL = URL(fileURLWithPath: simctl)
-        process.arguments = ["listapps", "booted"]
+        process.arguments = arguments
         process.standardOutput = stdoutPipe
         process.standardError = stderrPipe
         
@@ -71,16 +77,27 @@ struct SimulatorHelper {
         let stderr = String(data: stderrData, encoding: .utf8) ?? ""
         let stdout = String(data: stdoutData, encoding: .utf8) ?? ""
         
-        if status != 0 {
-            let msg = stderr.isEmpty ? "simctl exited with status \(status)" : stderr
+        return .success(CommandResultModel(stdOut: stdout, stdErr: stderr, status: status))
+    }
+    static func getBootedSimulatorApps() -> Result<[String], SimulatorHelperError> {
+        var commandResult: CommandResultModel;
+        switch execute(arguments: ["listapps", "booted"]) {
+        case .success(let res):
+            commandResult = res
+        case .failure(let err):
+            return .failure(err)
+        }
+
+        if commandResult.status != 0 {
+            let msg = commandResult.stdErr.isEmpty ? "simctl exited with status \(commandResult.status)" : commandResult.stdErr
             return .failure(.processFailed(msg))
         }
         
-        guard !stdout.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !commandResult.stdOut.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return .success([])
         }
         
-        guard let plistData = stdout.data(using: .utf8) else {
+        guard let plistData = commandResult.stdOut.data(using: .utf8) else {
             return .failure(.dataConversionFailed)
         }
         
@@ -98,34 +115,16 @@ struct SimulatorHelper {
     }
     
     static func fetchSimulatorPath(for bundleIdentifier: String) -> Result<String, SimulatorHelperError> {
-        let process = Process()
-        let pipe = Pipe()
-        let errorPipe = Pipe()
+        var commandResult: CommandResultModel;
+        switch execute(arguments: ["get_app_container", "booted", bundleIdentifier, "data"]) {
+        case .success(let res):
+            commandResult = res
+        case .failure(let err):
+            return .failure(err)
+        }
         
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
-        process.arguments = ["simctl", "get_app_container", "booted", bundleIdentifier, "data"]
-        process.standardOutput = pipe
-        process.standardError = errorPipe
-
-        do {
-            try process.run()
-        } catch {
-            return .failure(.processFailed("Failed to start process: \(error.localizedDescription)"))
-        }
-
-        process.waitUntilExit()
-
-        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-        if let errorOutput = String(data: errorData, encoding: .utf8), !errorOutput.isEmpty {
-            return .failure(.processFailed("Error: \(errorOutput)"))
-        }
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        if let output = String(data: data, encoding: .utf8) {
-            return .success(output.trimmingCharacters(in: .whitespacesAndNewlines))
-        } else {
-            return .failure(.dataConversionFailed)
-        }
+        return .success(commandResult.stdOut.trimmingCharacters(in: .whitespacesAndNewlines))
+        
     }
 
     static func openURLInSimulator(url: String) -> Result<Void, SimulatorHelperError> {
