@@ -29,6 +29,24 @@
 		A6C7311A2E532AF000190753 /* SimDevToolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimDevToolsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A6C7320B2E53A31700190753 /* Exceptions for "OldCode" folder in "SimDevTools" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Constants/Typealias.swift,
+				"Extensions/String+Extensions.swift",
+				Network/Core/NetworkError.swift,
+				Network/Core/NetworkLogger.swift,
+				Network/Core/NetworkLoggerProtocol.swift,
+				Network/Core/NetworkRequestType.swift,
+				Network/Core/NetworkService.swift,
+				Network/Core/NetworkServiceProtocol.swift,
+				Network/Core/NetworkState.swift,
+			);
+			target = A6C730FE2E532AEC00190753 /* SimDevTools */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A6C731012E532AEC00190753 /* SimDevTools */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -43,6 +61,14 @@
 		A6C7311D2E532AF000190753 /* SimDevToolsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SimDevToolsUITests;
+			sourceTree = "<group>";
+		};
+		A6C731EA2E53A2A600190753 /* OldCode */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A6C7320B2E53A31700190753 /* Exceptions for "OldCode" folder in "SimDevTools" target */,
+			);
+			path = OldCode;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +101,7 @@
 		A6C730F62E532AEC00190753 = {
 			isa = PBXGroup;
 			children = (
+				A6C731EA2E53A2A600190753 /* OldCode */,
 				A6C731012E532AEC00190753 /* SimDevTools */,
 				A6C731132E532AF000190753 /* SimDevToolsTests */,
 				A6C7311D2E532AF000190753 /* SimDevToolsUITests */,
