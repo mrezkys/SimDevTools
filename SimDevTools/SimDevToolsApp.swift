@@ -8,10 +8,17 @@
 import SwiftUI
 
 @main
-struct SimDevToolsApp: App {
+struct iOSSimulatorToolsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(DefaultWindowStyle())
+        .windowResizability(.contentSize)
+        .defaultSize(width: 400, height: 500)
     }
+}
+
+#Preview {
+    ContentView()
 }
