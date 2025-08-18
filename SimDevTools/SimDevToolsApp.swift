@@ -19,6 +19,6 @@ struct iOSSimulatorToolsApp: App {
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}

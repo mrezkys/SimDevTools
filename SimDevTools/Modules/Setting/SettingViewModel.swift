@@ -30,8 +30,6 @@ class SettingViewModel: ObservableObject {
 
     init(userDefaultsDatabase: UserDefaultsDatabaseProtocol = UserDefaultsDatabase()) {
         self.userDefaultsDatabase = userDefaultsDatabase
-        loadSavedData()
-        formListener()
     }
 
     func getInstalledApps() {

@@ -27,45 +27,71 @@ enum SimulatorHelperError: Error {
 
 struct SimulatorHelper {
     static func getBootedSimulatorApps() -> Result<[String], SimulatorHelperError> {
+        let devDir: String = {
+            let p = Process(); let out = Pipe()
+            p.executableURL = URL(fileURLWithPath: "/usr/bin/xcode-select")
+            p.arguments = ["-p"]; p.standardOutput = out
+            try? p.run(); p.waitUntilExit()
+            if p.terminationStatus == 0,
+               let s = String(data: out.fileHandleForReading.readDataToEndOfFile(),
+                              encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+               !s.isEmpty { return s }
+            return "/Applications/Xcode.app/Contents/Developer"
+        }()
+        
+        let simctl = "\(devDir)/usr/bin/simctl"
+        guard FileManager.default.isExecutableFile(atPath: simctl) else {
+            return .failure(.processFailed("simctl not found or not executable at \(simctl)"))
+        }
+        
         let process = Process()
-        let pipe = Pipe()
-        let errorPipe = Pipe()
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
         
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
-        process.arguments = ["simctl", "listapps", "booted"]
-        process.standardOutput = pipe
-        process.standardError = errorPipe
-
-        do {
-            try process.run()
-        } catch {
-            return .failure(.processFailed("Failed to start process: \(error.localizedDescription)"))
+        process.executableURL = URL(fileURLWithPath: simctl)
+        process.arguments = ["listapps", "booted"]
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+        
+        var env = ProcessInfo.processInfo.environment
+        env["DEVELOPER_DIR"] = devDir
+        process.environment = env
+        
+        do { try process.run() }
+        catch {
+            return .failure(.processFailed("Failed to start simctl: \(error.localizedDescription)"))
         }
-
         process.waitUntilExit()
-
-        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-        if let errorOutput = String(data: errorData, encoding: .utf8), !errorOutput.isEmpty {
-            return .failure(.processFailed("Error: \(errorOutput)"))
+        
+        let status = process.terminationStatus
+        let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+        let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        let stderr = String(data: stderrData, encoding: .utf8) ?? ""
+        let stdout = String(data: stdoutData, encoding: .utf8) ?? ""
+        
+        if status != 0 {
+            let msg = stderr.isEmpty ? "simctl exited with status \(status)" : stderr
+            return .failure(.processFailed(msg))
         }
         
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        guard let outputString = String(data: data, encoding: .utf8) else {
-            return .failure(.dataConversionFailed)
+        guard !stdout.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return .success([])
         }
         
-        guard let plistData = outputString.data(using: .utf8) else {
+        guard let plistData = stdout.data(using: .utf8) else {
             return .failure(.dataConversionFailed)
         }
         
         var format = PropertyListSerialization.PropertyListFormat.xml
         do {
-            if let plist = try PropertyListSerialization.propertyList(from: plistData, options: [], format: &format) as? [String: Any] {
-                let bundleIdentifiers = Array(plist.keys).sorted()
-                return .success(bundleIdentifiers)
-            } else {
-                return .failure(.plistParsingFailed("Failed to parse plist data"))
+            let obj = try PropertyListSerialization.propertyList(from: plistData, options: [], format: &format)
+            guard let dict = obj as? [String: Any] else {
+                return .failure(.plistParsingFailed("Top-level object is not a dictionary"))
             }
+            let bundleIDs = dict.keys.sorted()
+            return .success(bundleIDs)
         } catch {
             return .failure(.plistParsingFailed("Error parsing plist: \(error.localizedDescription)"))
         }
