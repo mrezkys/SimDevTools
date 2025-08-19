@@ -14,19 +14,11 @@
 			remoteGlobalIDString = A6C730FE2E532AEC00190753;
 			remoteInfo = SimDevTools;
 		};
-		A6C7311B2E532AF000190753 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A6C730F72E532AEC00190753 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A6C730FE2E532AEC00190753;
-			remoteInfo = SimDevTools;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A6C730FF2E532AEC00190753 /* SimDevTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimDevTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6C731102E532AF000190753 /* SimDevToolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimDevToolsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6C7311A2E532AF000190753 /* SimDevToolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimDevToolsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -58,11 +50,6 @@
 			path = SimDevToolsTests;
 			sourceTree = "<group>";
 		};
-		A6C7311D2E532AF000190753 /* SimDevToolsUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SimDevToolsUITests;
-			sourceTree = "<group>";
-		};
 		A6C731EA2E53A2A600190753 /* OldCode */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -88,13 +75,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6C731172E532AF000190753 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -104,7 +84,6 @@
 				A6C731EA2E53A2A600190753 /* OldCode */,
 				A6C731012E532AEC00190753 /* SimDevTools */,
 				A6C731132E532AF000190753 /* SimDevToolsTests */,
-				A6C7311D2E532AF000190753 /* SimDevToolsUITests */,
 				A6C731002E532AEC00190753 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -114,7 +93,6 @@
 			children = (
 				A6C730FF2E532AEC00190753 /* SimDevTools.app */,
 				A6C731102E532AF000190753 /* SimDevToolsTests.xctest */,
-				A6C7311A2E532AF000190753 /* SimDevToolsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -167,29 +145,6 @@
 			productReference = A6C731102E532AF000190753 /* SimDevToolsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A6C731192E532AF000190753 /* SimDevToolsUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A6C7312A2E532AF000190753 /* Build configuration list for PBXNativeTarget "SimDevToolsUITests" */;
-			buildPhases = (
-				A6C731162E532AF000190753 /* Sources */,
-				A6C731172E532AF000190753 /* Frameworks */,
-				A6C731182E532AF000190753 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A6C7311C2E532AF000190753 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A6C7311D2E532AF000190753 /* SimDevToolsUITests */,
-			);
-			name = SimDevToolsUITests;
-			packageProductDependencies = (
-			);
-			productName = SimDevToolsUITests;
-			productReference = A6C7311A2E532AF000190753 /* SimDevToolsUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -204,10 +159,6 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					A6C7310F2E532AF000190753 = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = A6C730FE2E532AEC00190753;
-					};
-					A6C731192E532AF000190753 = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = A6C730FE2E532AEC00190753;
 					};
@@ -229,7 +180,6 @@
 			targets = (
 				A6C730FE2E532AEC00190753 /* SimDevTools */,
 				A6C7310F2E532AF000190753 /* SimDevToolsTests */,
-				A6C731192E532AF000190753 /* SimDevToolsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -243,13 +193,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A6C7310E2E532AF000190753 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A6C731182E532AF000190753 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -273,13 +216,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A6C731162E532AF000190753 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -287,11 +223,6 @@
 			isa = PBXTargetDependency;
 			target = A6C730FE2E532AEC00190753 /* SimDevTools */;
 			targetProxy = A6C731112E532AF000190753 /* PBXContainerItemProxy */;
-		};
-		A6C7311C2E532AF000190753 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A6C730FE2E532AEC00190753 /* SimDevTools */;
-			targetProxy = A6C7311B2E532AF000190753 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -504,38 +435,6 @@
 			};
 			name = Release;
 		};
-		A6C7312B2E532AF000190753 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5LSQ3C9W8U;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mrezkys.SimDevToolsUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = SimDevTools;
-			};
-			name = Debug;
-		};
-		A6C7312C2E532AF000190753 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5LSQ3C9W8U;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mrezkys.SimDevToolsUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = SimDevTools;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -562,15 +461,6 @@
 			buildConfigurations = (
 				A6C731282E532AF000190753 /* Debug */,
 				A6C731292E532AF000190753 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A6C7312A2E532AF000190753 /* Build configuration list for PBXNativeTarget "SimDevToolsUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A6C7312B2E532AF000190753 /* Debug */,
-				A6C7312C2E532AF000190753 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
