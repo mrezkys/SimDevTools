@@ -23,7 +23,15 @@ class SettingViewModel: ObservableObject {
     }
     @Published var selectedAppBundle: String = ""
     @Published var appBundles: [String] = []
-    @Published var message: ContentHeaderMessageModel? = nil
+    var message: HeaderMessage? = nil {
+        didSet {
+            if message != nil {
+                headerMessageViewData = .init(message!)
+            }
+            
+        }
+    }
+    @Published var headerMessageViewData: ContentHeaderView.HeaderMessageViewData? = nil
     @Published var canSaveSetting: Bool = false
 
     private let userDefaultsDatabase: UserDefaultsDatabaseProtocol
@@ -32,10 +40,10 @@ class SettingViewModel: ObservableObject {
         self.userDefaultsDatabase = userDefaultsDatabase
     }
 
+
     func getInstalledApps() {
         appBundles.removeAll()
         viewState = .loading
-        message = .getLoadingMessage(for: "Get Installed Apps")
 
         let result: Result<[String], SimulatorHelperError> = SimulatorHelper.getBootedSimulatorApps()
 
@@ -43,7 +51,10 @@ class SettingViewModel: ObservableObject {
         case .success(let appBundles):
             if appBundles.isEmpty {
                 viewState = .appsNotDetected
-                message = ContentHeaderMessageModel(text: "No installed apps found or failed to fetch app bundles.", type: .error)
+                message = .init(
+                    text: "No installed apps found or failed to fetch app bundles.",
+                    kind: .error
+                )
             } else {
                 viewState = .normal
                 self.appBundles = appBundles
@@ -52,12 +63,20 @@ class SettingViewModel: ObservableObject {
         case .failure(let error):
             viewState = .simulatorNotDetected
             message = ContentHeaderMessageModel(text: error.localizedDescription, type: .error)
+            
+            message = .init(
+                text: error.localizedDescription,
+                kind: .error
+            )
         }
     }
 
     func validateAppBundle() -> Bool {
         if selectedAppBundle.isEmpty {
-            message = ContentHeaderMessageModel(text: "Please select an App Bundle before saving", type: .error)
+            message = .init(
+                text: "Please select an App Bundle before saving",
+                kind: .error
+            )
             return false
         } else {
             return true
@@ -66,7 +85,7 @@ class SettingViewModel: ObservableObject {
 
     func save() {
         if validateAppBundle() {
-            message = ContentHeaderMessageModel(text: "Saved successfully", type: .success)
+            message = .init(text: "Saved successfully", kind: .success)
             userDefaultsDatabase.save(value: selectedAppBundle, forKey: .selectedAppBundle)
             loadSavedData()
             formListener()
