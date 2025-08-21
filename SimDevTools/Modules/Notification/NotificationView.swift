@@ -12,31 +12,31 @@ struct NotificationView: View {
     
     var body: some View {
         VStack(alignment: .leading){
-            ContentHeaderView(
-                titleText: "Push Notification",
-                message: viewModel.message,
-                buttonEnabled: true,
-                buttonText: "Send",
-                buttonAction: {
-                    viewModel.sendPushNotification()
-                }
-            )
-            VStack(alignment: .leading) {
-                Text("Select Push Notification Template")
-                Picker("Select Template:", selection: $viewModel.selectedTemplate) {
-                    ForEach(viewModel.templates, id: \.id) { template in
-                        Text(template.rawValue).tag(template)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-            }
-            .padding()
-            
-            TextEditor(text: $viewModel.jsonPayload)
-                .border(AppColor.separatorColor, width: 1)
-            
-            Spacer()
+//            ContentHeaderView(
+//                titleText: "Push Notification",
+//                message: viewModel.message,
+//                buttonEnabled: true,
+//                buttonText: "Send",
+//                buttonAction: {
+//                    viewModel.sendPushNotification()
+//                }
+//            )
+//            VStack(alignment: .leading) {
+//                Text("Select Push Notification Template")
+//                Picker("Select Template:", selection: $viewModel.selectedTemplate) {
+//                    ForEach(viewModel.templates, id: \.id) { template in
+//                        Text(template.rawValue).tag(template)
+//                    }
+//                }
+//                .labelsHidden()
+//                .pickerStyle(.menu)
+//            }
+//            .padding()
+//            
+//            TextEditor(text: $viewModel.jsonPayload)
+//                .border(AppColor.separatorColor, width: 1)
+//            
+//            Spacer()
         }
         .resizeToContentFrame()
         .onChange(of: viewModel.selectedTemplate) { _, newTemplate in
