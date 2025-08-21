@@ -7,29 +7,71 @@
 
 import SwiftUI
 
-struct ContentHeaderView: View {
-    let titleText: String
-    let buttonText: String?
-    let buttonEnabled: Bool?
-    let buttonAction: (() -> Void)?
-    let message: ContentHeaderMessageModel?
-    
-    var showMessage: Bool {
-        return message != nil
+// Business/domain representation of a header message
+struct HeaderMessage: Equatable {
+    enum Kind {
+        case error
+        case success
+        case info
     }
+
+    let text: String
+    let kind: Kind
+}
+
+struct HeaderMessageViewData: Equatable {
+    enum Kind { case error, success, info }
+
+    let text: LocalizedStringKey
+    let kind: Kind
+
+    var iconName: String {
+        switch kind {
+        case .error:   "exclamationmark.triangle.fill"
+        case .success: "checkmark.circle.fill"
+        case .info:    "info.circle.fill"
+        }
+    }
+    var tint: Color {
+        switch kind {
+        case .error:   .red
+        case .success: .green
+        case .info:    .blue
+        }
+    }
+    var background: Color { tint.opacity(0.12) }
     
+    init(_ m: HeaderMessage) {
+        self.text = LocalizedStringKey(m.text)
+        self.kind = {
+            switch m.kind {
+            case .error: .error
+            case .success: .success
+            case .info: .info
+            }
+        }()
+    }
+}
+
+struct ContentHeaderView: View {
+    struct ButtonConfig {
+        let title: LocalizedStringKey
+        var enabled: Bool = true
+        let onTap: () -> Void
+    }
+
+    let titleText: String
+    let button: ButtonConfig?
+    let message: HeaderMessageViewData?
+
     init(
         titleText: String,
-        message: ContentHeaderMessageModel? = nil,
-        buttonEnabled: Bool? = nil,
-        buttonText: String? = nil,
-        buttonAction: (() -> Void)? = nil
+        message: HeaderMessageViewData? = nil,
+        button: ButtonConfig? = nil
     ) {
         self.titleText = titleText
-        self.buttonText = buttonText
-        self.buttonAction = buttonAction
         self.message = message
-        self.buttonEnabled = buttonEnabled
+        self.button = button
     }
     
     var body: some View {
@@ -38,14 +80,14 @@ struct ContentHeaderView: View {
                 Text(titleText)
                     .font(.headline)
                 Spacer()
-                if let buttonText = buttonText, let buttonAction = buttonAction {
-                    Button(action: buttonAction) {
-                        Text(buttonText)
+                if let button = button {
+                    Button(action: button.onTap) {
+                        Text(button.title)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 8)
                             .frame(minWidth: 80)
                     }
-                    .disabled(!(buttonEnabled ?? true))
+                    .disabled(!button.enabled)
                 }
             }
             .padding(16)
@@ -55,14 +97,14 @@ struct ContentHeaderView: View {
             )
             if let message = message {
                 HStack(alignment: .center) {
-                    Image(systemName: message.type.iconName)
-                        .foregroundColor(message.type.backgroundColor)
+                    Image(systemName: message.iconName)
+                        .foregroundColor(message.tint)
                     Text(message.text)
                     Spacer()
                     
                 }
                 .padding(16)
-                .background(message.type.backgroundColor.opacity(0.3))
+                .background(message.background)
                 .transition(.slide)
             }
         }
@@ -72,37 +114,43 @@ struct ContentHeaderView: View {
 
 
 #Preview("Error Message") {
+    let errorMessage = HeaderMessage(
+        text: "An unexpected error has occurred.",
+        kind: .error
+    )
     ContentHeaderView(
         titleText: "Error Occurred",
-        message: ContentHeaderMessageModel(text: "An unexpected error has occurred.", type: .error),
-        buttonEnabled: true, 
-        buttonText: "Retry",
-        buttonAction: {
-            // Retry action
+        message: .init(errorMessage),
+        button: .init(title: "Retry") {
+            
         }
     )
 }
 
 #Preview("Success Message") {
+    let successMessage = HeaderMessage(
+        text: "Your operation was successful.",
+        kind: .success
+    )
     ContentHeaderView(
-        titleText: "Success!",
-        message: ContentHeaderMessageModel(text: "Your operation was successful.", type: .success),
-        buttonEnabled: true, 
-        buttonText: "Continue",
-        buttonAction: {
-            // Continue action
+        titleText: "Success",
+        message: .init(successMessage),
+        button: .init(title: "Continue") {
+            
         }
     )
 }
 
 #Preview("General Message") {
+    let infoMessage = HeaderMessage(
+        text: "Please review the details above.",
+        kind: .info
+    )
     ContentHeaderView(
         titleText: "Information",
-        message: ContentHeaderMessageModel(text: "Please review the details above.", type: .general),
-        buttonEnabled: true,
-        buttonText: "OK",
-        buttonAction: {
-            // OK action
+        message: .init(infoMessage),
+        button: .init(title: "Ok") {
+            
         }
     )
 }
