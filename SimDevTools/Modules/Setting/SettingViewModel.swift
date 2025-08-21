@@ -11,6 +11,7 @@ enum SettingViewState {
     case simulatorNotDetected
     case appsNotDetected
     case loading
+    case error
 }
 
 class SettingViewModel: ObservableObject {
@@ -61,8 +62,13 @@ class SettingViewModel: ObservableObject {
                 selectedAppBundle = appBundles.first ?? ""
             }
         case .failure(let error):
-            viewState = .simulatorNotDetected
-            message = ContentHeaderMessageModel(text: error.localizedDescription, type: .error)
+            switch error {
+            case .noDevicesAreBooted:
+                viewState = .simulatorNotDetected
+            default:
+                viewState = .error
+            }
+            
             
             message = .init(
                 text: error.localizedDescription,

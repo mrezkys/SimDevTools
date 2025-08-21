@@ -46,6 +46,11 @@ struct SettingView: View {
                 )
             case .loading:
                 LoadingView()
+            case .error:
+                ContentHeaderView(
+                    titleText: "Configuration",
+                    message: viewModel.headerMessageViewData
+                )
             }
             Spacer()
         }
