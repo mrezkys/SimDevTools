@@ -8,12 +8,15 @@
 import Foundation
 
 enum SimulatorHelperError: Error {
+    case noDevicesAreBooted
     case processFailed(String)
     case dataConversionFailed
     case plistParsingFailed(String)
     
     var localizedDescription: String {
         switch self {
+        case .noDevicesAreBooted:
+            return "No devices are booted"
         case .processFailed(let message):
             return "Process failed: \(message)"
         case .dataConversionFailed:
@@ -90,6 +93,9 @@ struct SimulatorHelper {
 
         if commandResult.status != 0 {
             let msg = commandResult.stdErr.isEmpty ? "simctl exited with status \(commandResult.status)" : commandResult.stdErr
+            if msg.lowercased().contains("no devices are booted") {
+                return .failure(.noDevicesAreBooted)
+            }
             return .failure(.processFailed(msg))
         }
         
