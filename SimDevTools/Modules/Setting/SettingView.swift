@@ -17,10 +17,8 @@ struct SettingView: View {
             case .normal:
                 ContentHeaderView(
                     titleText: "Configuration",
-                    message: viewModel.message,
-                    buttonEnabled: viewModel.canSaveSetting,
-                    buttonText: "Save",
-                    buttonAction: {
+                    message: viewModel.headerMessageViewData,
+                    button: .init(title: "Save") {
                         viewModel.save()
                     }
                 )
@@ -41,9 +39,8 @@ struct SettingView: View {
             case .appsNotDetected, .simulatorNotDetected:
                 ContentHeaderView(
                     titleText: "Configuration",
-                    message: viewModel.message,
-                    buttonText: "Detect App",
-                    buttonAction: {
+                    message: viewModel.headerMessageViewData,
+                    button: .init(title: "Detect App") {
                         viewModel.getInstalledApps()
                     }
                 )
