@@ -39,9 +39,9 @@ struct NotificationView: View {
 //            Spacer()
         }
         .resizeToContentFrame()
-        .onChange(of: viewModel.selectedTemplate) { _, newTemplate in
-            viewModel.jsonPayload = newTemplate.payload
-        }
+//        .onChange(of: viewModel.selectedTemplate) { _, newTemplate in
+//            viewModel.jsonPayload = newTemplate.payload
+//        }
     }
 }
 

@@ -61,7 +61,7 @@ struct StorageView: View {
         .resizeToContentFrame()
         .onAppear{
             Task {
-                viewModel.loadUserDefaults()
+//                viewModel.loadUserDefaults()
             }
         }
     }

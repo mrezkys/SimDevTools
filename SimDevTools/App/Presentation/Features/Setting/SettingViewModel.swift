@@ -32,7 +32,7 @@ class SettingViewModel: ObservableObject {
             
         }
     }
-    @Published var headerMessageViewData: ContentHeaderView.HeaderMessageViewData? = nil
+    @Published var headerMessageViewData: HeaderMessageViewData? = nil
     @Published var canSaveSetting: Bool = false
 
     private let userDefaultsDatabase: UserDefaultsDatabaseProtocol
