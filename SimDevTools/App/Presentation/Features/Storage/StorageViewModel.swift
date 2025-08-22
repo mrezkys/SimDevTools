@@ -1,18 +1,18 @@
+////
+////  StorageViewModel.swift
+////  InternalDeveloperTool
+////
+////  Created by Muhammad Rezky on 01/10/24.
+////
 //
-//  StorageViewModel.swift
-//  InternalDeveloperTool
+//import SwiftUI
 //
-//  Created by Muhammad Rezky on 01/10/24.
+//enum StorageViewState {
+//    case normal
+//    case loading
+//}
 //
-
-import SwiftUI
-
-enum StorageViewState {
-    case normal
-    case loading
-}
-
-class StorageViewModel: ObservableObject {
+//class StorageViewModel: ObservableObject {
 //    private let userDefaultsDatabase: UserDefaultsDatabaseProtocol
 //
 //    @Published var viewState: StorageViewState = .normal
@@ -35,38 +35,38 @@ class StorageViewModel: ObservableObject {
 //        getSelectedBundleIdentifier()
 //    }
 //    
-//    func getSelectedBundleIdentifier() {
-//        bundleIdentifier = userDefaultsDatabase.getValue(forKey: .selectedAppBundle)
-//        print("Bundle Identifier:", bundleIdentifier ?? "None")
-//    }
-//    
-//    func loadUserDefaults() {
-//        viewState = .loading
-//        message = .getLoadingMessage(for: "Load User Defaults")
-//        print("Start Load User Defaults")
-//        guard let bundleIdentifier = bundleIdentifier else {
-//            message = ContentHeaderMessageModel(text: "No bundle identifier found.", type: .error)
-//            viewState = .normal
-//            return
-//        }
-//
-//        let pathResult = SimulatorHelper.fetchSimulatorPath(for: bundleIdentifier)
-//
-//        switch pathResult {
-//        case .success(let path):
-//            simulatorPath = path
-//            print("Simulator Path:", path)
-//            userDefaults = readUserDefaults(at: path)
-//            viewState = .normal
-//            message = ContentHeaderMessageModel(text: "User defaults loaded successfully.", type: .success)
-//        case .failure(let failure):
-//            message = ContentHeaderMessageModel(text: failure.localizedDescription, type: .error)
-//            print("Failed to fetch simulator path:", failure.localizedDescription)
-//            viewState = .normal
-//        }
-//        print("End Load User Defaults")
-//    }
-//    
+////    func getSelectedBundleIdentifier() {
+////        bundleIdentifier = userDefaultsDatabase.getValue(forKey: .selectedAppBundle)
+////        print("Bundle Identifier:", bundleIdentifier ?? "None")
+////    }
+////    
+////    func loadUserDefaults() {
+////        viewState = .loading
+////        message = .getLoadingMessage(for: "Load User Defaults")
+////        print("Start Load User Defaults")
+////        guard let bundleIdentifier = bundleIdentifier else {
+////            message = ContentHeaderMessageModel(text: "No bundle identifier found.", type: .error)
+////            viewState = .normal
+////            return
+////        }
+////
+////        let pathResult = SimulatorHelper.fetchSimulatorPath(for: bundleIdentifier)
+////
+////        switch pathResult {
+////        case .success(let path):
+////            simulatorPath = path
+////            print("Simulator Path:", path)
+////            userDefaults = readUserDefaults(at: path)
+////            viewState = .normal
+////            message = ContentHeaderMessageModel(text: "User defaults loaded successfully.", type: .success)
+////        case .failure(let failure):
+////            message = ContentHeaderMessageModel(text: failure.localizedDescription, type: .error)
+////            print("Failed to fetch simulator path:", failure.localizedDescription)
+////            viewState = .normal
+////        }
+////        print("End Load User Defaults")
+////    }
+////    
 //    private let coreSimBookmarkKey = "CoreSimRootBookmark"
 //    
 //    func resolveCoreSimRootBookmark() -> URL? {
@@ -188,4 +188,4 @@ class StorageViewModel: ObservableObject {
 //            message = ContentHeaderMessageModel(text: "Failed to save user defaults.", type: .error)
 //        }
 //    }
-}
+//}
