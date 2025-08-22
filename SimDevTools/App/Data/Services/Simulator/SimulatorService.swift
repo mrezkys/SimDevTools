@@ -8,12 +8,12 @@
 import Foundation
 
 public final class SimulatorService: SimulatorServiceProtocol {
-    private let runner: CommandRunner
+    private let runner: CommandRunnerProtocol
     private let devDir: String
     private let simctlPath: String
     private let xcrunPath: String = "/usr/bin/xcrun"
 
-    public init(runner: CommandRunner = DefaultCommandRunner(), devDir: String? = nil) {
+    public init(runner: CommandRunnerProtocol = DefaultCommandRunner(), devDir: String? = nil) {
         self.runner = runner
         let resolved = devDir ?? SimulatorService.resolveDeveloperDir()
         self.devDir = resolved
