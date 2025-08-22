@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum SimulatorError: Error {
+public enum SimulatorError: Error, Equatable {
     case noDevicesAreBooted
     case commandFailed(String)
     case plistParsing(String)
