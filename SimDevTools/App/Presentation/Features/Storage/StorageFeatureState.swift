@@ -23,7 +23,7 @@ struct StorageFeatureState: Equatable {
     var searchText: String = ""
     var rawEntries: [UDEntry] = []
     
-    var filteredEntries: [UDEntry] {            // <- convenience for the View
+    var filteredEntries: [UDEntry] {
         guard !searchText.isEmpty else { return rawEntries }
         let q = searchText.lowercased()
         return rawEntries.filter { $0.key.lowercased().contains(q) || $0.valueString.lowercased().contains(q) }

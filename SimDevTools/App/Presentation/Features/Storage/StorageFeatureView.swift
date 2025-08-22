@@ -52,8 +52,6 @@ struct StorageView: View {
                     titleText: "Storage",
                     message: headerMessage(),
                     button: .init(title: "Open Configuration") {
-                        // You might navigate to your Settings screen here.
-                        // As a simple fallback, retry triggers the same guidance banner.
                         store.send(.readSelectedAppUserDefault)
                     }
                 )
@@ -64,7 +62,6 @@ struct StorageView: View {
                     titleText: "Storage",
                     message: headerMessage(),
                     button: .init(title: "Grant Access") {
-                        // Re-running the read will prompt NSOpenPanel via AccessProvider
                         store.send(.readSelectedAppUserDefault)
                     }
                 )
@@ -87,7 +84,6 @@ struct StorageView: View {
         .onAppear { store.send(.onAppear) }
     }
 
-    // MARK: - Pieces
 
     @ViewBuilder
     private func contentList() -> some View {
@@ -95,7 +91,6 @@ struct StorageView: View {
             Text("This feature lets you **read** app UserDefaults from the simulator.")
                 .padding(16)
 
-            // Search
             TextField("Search by key or value", text: Binding(
                 get: { store.state.searchText },
                 set: { store.send(.searchTextChanged($0)) }
@@ -104,7 +99,6 @@ struct StorageView: View {
             .padding(.horizontal)
             .padding(.bottom, 8)
 
-            // Entries list (read-only view for now)
             ScrollView {
                 LazyVStack(alignment: .leading) {
                     ForEach(store.state.filteredEntries, id: \.id) { entry in
@@ -158,7 +152,7 @@ struct StorageView: View {
             break
         }
         if let msg = store.state.message {
-            return HeaderMessageViewData(msg) // your mapper init(_ m: HeaderMessage)
+            return HeaderMessageViewData(msg)
         }
         return nil
     }

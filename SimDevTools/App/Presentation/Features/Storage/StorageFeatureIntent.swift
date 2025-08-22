@@ -13,8 +13,8 @@ enum StorageFeatureIntent {
     case appBundleLoaded(String?)
 
     case readSelectedAppUserDefault
-    case didSuccessReadSelectedAppUserDefault([UDEntry])   // <- changed
-    case didErrorReadSelectedAppUserDefault(StorageFeatureError)   // <- typed
+    case didSuccessReadSelectedAppUserDefault([UDEntry])
+    case didErrorReadSelectedAppUserDefault(StorageFeatureError)
 
     case searchTextChanged(String)
     case clearMessage
