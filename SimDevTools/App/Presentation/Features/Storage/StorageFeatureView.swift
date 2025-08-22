@@ -9,7 +9,6 @@ import SwiftUI
 struct StorageView: View {
     @StateObject private var store: Store<StorageFeatureReducer>
 
-    /// Compose dependencies here (or inject from a parent DI/root)
     init(
         storage: StorageFeatureStorage = UserDefaultsStorageFeatureStorage(
             db: UserDefaultsDatabase()
