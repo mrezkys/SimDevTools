@@ -68,7 +68,7 @@ struct StorageFeatureReducer: Reducer {
                     defer { root.stopAccessingSecurityScopedResource() }
 
                     let dict = try env.filesystem.readUserDefaults(coreSimRoot: root, bundleId: bundleId)
-                    let entries = mapPlistDictToEntries(dict)
+                    let entries = PlistMapping.mapPlistDictToEntries(dict)
                     return .didSuccessReadSelectedAppUserDefault(entries)
 
                 } catch let e as CoreSimulatorAccessError {
