@@ -19,6 +19,48 @@ public final class SimulatorService: SimulatorServiceProtocol {
         self.devDir = resolved
         self.simctlPath = "\(resolved)/usr/bin/simctl"
     }
+    
+    public func getBootedSimulators() async throws -> [BootedSimulator] {
+        let env = ["DEVELOPER_DIR": devDir]
+        let res = try await runner.run(
+            simctlPath,
+            ["list", "devices", "booted", "--json"],
+            env: env
+        )
+
+        if res.status != 0 {
+            throw mapSimctlError(stderr: res.stdErr, status: res.status)
+        }
+
+        struct DevicesResponse: Decodable {
+            let devices: [String: [BootedSimulator]]
+        }
+
+        guard let data = res.stdOut.data(using: .utf8) else {
+            throw SimulatorError.utf8Decoding
+        }
+
+        let decoded = try JSONDecoder().decode(DevicesResponse.self, from: data)
+
+        let all = decoded.devices.values.flatMap { $0 }
+
+        return all.filter { $0.state == "Booted" }
+    }
+    
+    public func getAppBundleIDs(forUDID udid: String) async throws -> [String] {
+        let env = ["DEVELOPER_DIR": devDir]
+        let res = try await runner.run(simctlPath, ["listapps", udid], env: env)
+
+        if res.status != 0 {
+            throw mapSimctlError(stderr: res.stdErr, status: res.status)
+        }
+
+        let trimmed = res.stdOut.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        let keys = try Plist.topLevelDictionaryKeys(fromUTF8: trimmed)
+        return keys.sorted()
+    }
 
     public func getBootedAppBundleIDs() async throws -> [String] {
         let env = ["DEVELOPER_DIR": devDir]
@@ -63,4 +105,17 @@ public final class SimulatorService: SimulatorServiceProtocol {
            !s.isEmpty { return s }
         return "/Applications/Xcode.app/Contents/Developer"
     }
+}
+
+
+public struct BootedSimulator: Codable, Equatable, Hashable, Identifiable {
+    public var id: String { udid }
+    public let udid: String
+    public let name: String
+    public let state: String
+    public let isAvailable: Bool
+    public let deviceTypeIdentifier: String
+    public let lastBootedAt: String?
+    public let dataPath: String?
+    public let logPath: String?
 }
