@@ -8,5 +8,6 @@
 import Foundation
 
 enum UserDefaultsKey: String {
-    case selectedAppBundle = "selectedAppBundle"
+    case targetSimulatorID = "targetSimulatorID-4"
+    case selectedAppBundle = "selectedAppBundle-4"
 }
