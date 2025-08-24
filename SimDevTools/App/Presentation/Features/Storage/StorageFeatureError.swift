@@ -11,6 +11,7 @@ enum StorageFeatureError: Equatable, Error {
     case notConfigured
     case access(CoreSimulatorAccessError)
     case fs(CoreSimulatorFilesystemError)
+    case writeFailed(String)
     case unknown(String)
 
     var message: String {
@@ -31,6 +32,8 @@ enum StorageFeatureError: Equatable, Error {
             case .plistNotDictionary:         return "Preferences plist is not a dictionary."
             case .io(let s):                  return s
             }
+        case .writeFailed(let s):
+            return "Failed to write value: \(s)"
         case .unknown(let s):
             return s
         }

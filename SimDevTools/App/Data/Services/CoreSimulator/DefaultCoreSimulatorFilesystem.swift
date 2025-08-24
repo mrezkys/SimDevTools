@@ -63,4 +63,23 @@ public struct DefaultCoreSimulatorFilesystem: CoreSimulatorFilesystem {
             throw CoreSimulatorFilesystemError.io("Read plist failed: \(error.localizedDescription)")
         }
     }
+
+    public func writeUserDefaults(coreSimRoot: URL, bundleId: String, key: String, value: Any) throws {
+        let container = try findAppContainer(coreSimRoot: coreSimRoot, bundleId: bundleId)
+        let plistURL = container.appendingPathComponent("Library/Preferences/\(bundleId).plist")
+
+        do {
+            var dict = try readUserDefaults(coreSimRoot: coreSimRoot, bundleId: bundleId)
+
+            dict[key] = value
+
+            let updatedData = try PropertyListSerialization.data(fromPropertyList: dict, format: .xml, options: 0)
+            try updatedData.write(to: plistURL, options: .atomic)
+
+        } catch let e as CoreSimulatorFilesystemError {
+            throw e
+        } catch {
+            throw CoreSimulatorFilesystemError.io("Write plist failed: \(error.localizedDescription)")
+        }
+    }
 }
