@@ -16,14 +16,20 @@ enum SettingViewState: Equatable {
 }
 
 struct SettingState: Equatable {
+    var hasBeenInitialized: Bool = false
     var viewState: SettingViewState = .normal
     var selectedAppBundle: String = ""
     var savedAppBundle: String = ""
     var appBundles: [String] = []
+
+    var bootedSimulators: [BootedSimulator] = []
+    var selectedBootedSimulatorID: String = ""
+    var savedTargetSimulatorID: String = ""
     
     var message: HeaderMessage? = nil
     
     var canSave: Bool {
-        !selectedAppBundle.isEmpty && selectedAppBundle != savedAppBundle
+        return true
+//        !selectedAppBundle.isEmpty && selectedAppBundle != savedAppBundle
     }
 }

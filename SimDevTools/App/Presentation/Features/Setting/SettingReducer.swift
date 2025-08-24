@@ -26,35 +26,147 @@ struct SettingReducer: Reducer {
         switch intent {
         case .onAppear:
             return [
-                Effect { .loadSavedAppBundle },
-                Effect { .detectAppsTapped }
+                Effect { .initSettingData }
             ]
-        case .loadSavedAppBundle:
-            return [
-                Effect { [env] in
-                        .savedAppBundleLoaded(env.storage.loadAppBundle())
-                }
-            ]
-        case .savedAppBundleLoaded(let saved):
-            state.savedAppBundle = saved ?? ""
-            if state.selectedAppBundle.isEmpty {
-                state.selectedAppBundle = state.savedAppBundle
-            }
-            return [.none]
-            
-
-        case .detectAppsTapped:
+        case .initSettingData:
             state.viewState = .loading
             state.message = nil
+            
+            return [
+                Effect { .getBootedSimulators },
+            ]
+        case .getBootedSimulators:
             return [
                 Effect { [env] in
                     do {
-                        let bundles = try await env.simulator.getBootedAppBundleIDs()
+                        let bootedSimulator = try await env.simulator.getBootedSimulators()
+                        return .didSuccessGetBootedSimulators(bootedSimulator)
+                    } catch let e as SimulatorError {
+                        return .didFailedGetBootedSimulators(e)
+                    } catch {
+                        return .didFailedGetBootedSimulators(.commandFailed(error.localizedDescription))
+                    }
+                }
+            ]
+        case .didSuccessGetBootedSimulators(let bootedSimulators):
+            if bootedSimulators.isEmpty {
+                state.viewState = .simulatorNotDetected
+                state.message = .init(
+                    text: "You need to boot simulator",
+                    kind: .error
+                )
+                return [.none]
+            }
+            state.viewState = .normal
+            state.bootedSimulators = bootedSimulators
+            return [
+                Effect {
+                    return .getSavedTargetSimulator
+                }
+            ]
+        case .didFailedGetBootedSimulators(let err):
+            state.viewState = .error
+            state.message = .init(text: err.localizedDescription, kind: .error)
+            return [.none]
+        case .bootedSimulatorIDSelected(let selectedBootedSimulatorID):
+            state.selectedBootedSimulatorID = selectedBootedSimulatorID
+            state.message = nil
+            return [
+                Effect {
+                    .saveTargetSimulatorTapped
+                }
+            ]
+        case .getSavedTargetSimulator:
+            return [
+                Effect { [env] in
+                    .savedTargetSimulatorLoaded(env.storage.loadTargetSimulatorID())
+                }
+            ]
+            
+        case .savedTargetSimulatorLoaded(let maybeSavedID):
+            let saved = maybeSavedID ?? ""
+            let isValid = !saved.isEmpty && state.bootedSimulators.contains { $0.udid == saved }
+            if isValid {
+                state.savedTargetSimulatorID = saved
+                // prefer saved if user hasnt manually selected one yet
+                if state.selectedBootedSimulatorID.isEmpty {
+                    state.selectedBootedSimulatorID = saved
+                }
+            } else {
+                state.savedTargetSimulatorID = ""
+                // only clear selected if it points to a non booted device
+                if !state.bootedSimulators.contains(where: { $0.udid == state.selectedBootedSimulatorID }) {
+                    state.selectedBootedSimulatorID = ""
+                }
+            }
+
+            if !state.selectedBootedSimulatorID.isEmpty, state.bootedSimulators .contains(where: { $0.udid == state.selectedBootedSimulatorID }) {
+                return [
+                    Effect { .getAppBundlesFromSimulator },
+                    Effect { .loadSavedAppBundle }
+                ]
+            }
+
+            return [ .none ]
+            
+            
+        case .saveTargetSimulatorTapped:
+            guard !state.selectedBootedSimulatorID.isEmpty else {
+                state.message = .init(
+                    text: "Please select an Target Simulator before Starting",
+                    kind: .error
+                )
+                return [.none]
+            }
+            state.viewState = .loading
+            let simulatorID = state.selectedBootedSimulatorID
+            return [Effect { [env] in
+                do {
+                    try env.storage.saveTargetSimulatorID(simulatorID)
+                    return .saveTargetSimulatorSuccess
+                } catch {
+                    return .saveTargetSimulatorSuccessFailed(.storageSaveError)
+                }
+            }]
+        case .saveTargetSimulatorSuccess:
+            state.viewState = .normal
+            state.message = .init(text: "Saved successfully", kind: .success)
+            return [
+                Effect { [env] in
+                    await env.sleepMS(2_000)
+                    return .clearMessage
+                },
+                Effect { .getAppBundlesFromSimulator }
+            ]
+        case .saveTargetSimulatorSuccessFailed(let err):
+            state.message = .init(text: "Error Saving: \(err.localizedDescription)", kind: .error)
+            return [.none]
+        case .getAppBundlesFromSimulator:
+            let targetSimulatorID = state.selectedBootedSimulatorID
+            return [
+                Effect { .clearLoadedAppBundlesAndSelectedAppBundle },
+                Effect { [env] in
+                    do {
+                        let bundles = try await env.simulator.getAppBundleIDs(forUDID: targetSimulatorID)
                         return .appsFetchedSuccess(bundles)
                     } catch let e as SimulatorError {
                         return .appsFetchedFailure(e)
                     } catch {
                         return .appsFetchedFailure(.commandFailed(error.localizedDescription))
+                    }
+                }
+            ]
+        case .clearLoadedAppBundlesAndSelectedAppBundle:
+            state.appBundles = []
+            state.selectedAppBundle = ""
+            state.savedAppBundle = ""
+            return [
+                Effect { [env] in
+                    do {
+                        try env.storage.removeSavedAppBundle()
+                        return .none
+                    } catch {
+                        return .none
                     }
                 }
             ]
@@ -72,7 +184,7 @@ struct SettingReducer: Reducer {
                 if !state.savedAppBundle.isEmpty, bundles.contains(state.savedAppBundle) {
                     state.selectedAppBundle = state.savedAppBundle
                 } else {
-                    state.selectedAppBundle = bundles.first ?? ""
+                    state.selectedAppBundle = ""
                 }
                 state.message = nil
             }
@@ -88,15 +200,12 @@ struct SettingReducer: Reducer {
         case .appBundleSelected(let bundle):
             state.selectedAppBundle = bundle
             state.message = nil
-            return [.none]
+            return [
+                Effect {
+                    .saveAppBundleButtonTapped
+                }
+            ]
         case .saveAppBundleButtonTapped:
-            guard !state.selectedAppBundle.isEmpty else {
-                state.message = .init(
-                    text: "Please select an App Bundle before saving",
-                    kind: .error
-                )
-                return [.none]
-            }
             state.viewState = .loading
             let bundle = state.selectedAppBundle
             return [Effect { [env] in
@@ -125,6 +234,24 @@ struct SettingReducer: Reducer {
         case .clearMessage:
             state.message = nil
             return [.none]
+            
+        case .loadSavedAppBundle:
+            return [
+                Effect { [env] in
+                        .savedAppBundleLoaded(env.storage.loadAppBundle())
+                }
+            ]
+        case .savedAppBundleLoaded(let saved):
+            if saved == nil {
+                state.savedAppBundle = ""
+                state.selectedAppBundle = ""
+            } else {
+                state.savedAppBundle = saved!
+                state.selectedAppBundle = saved!
+            }
+            return [.none]
+            
+
         }
     }
 }

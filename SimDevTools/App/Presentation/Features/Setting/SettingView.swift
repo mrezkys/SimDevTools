@@ -35,54 +35,74 @@ struct SettingView: View {
             case .normal:
                 ContentHeaderView(
                     titleText: "Configuration",
-                    message: headerMessage(),
-                    button: .init(title: "Save", enabled: store.state.canSave) {
-                        store.send(.saveAppBundleButtonTapped)
-                    }
+                    message: headerMessage()
                 )
-
+                
                 VStack(alignment: .leading) {
-                    Text("Select App target")
+                    Text("Select Simulator Target")
                     Picker("", selection: Binding(
-                        get: { store.state.selectedAppBundle },
-                        set: { store.send(.appBundleSelected($0)) }
+                        get: { store.state.selectedBootedSimulatorID },
+                        set: { store.send(.bootedSimulatorIDSelected($0)) }
                     )) {
-                        ForEach(store.state.appBundles, id: \.self) { bundle in
-                            Text(bundle)
+                        ForEach(store.state.bootedSimulators, id: \.self) { bootedSimulator in
+                            Text("\(bootedSimulator.name) (\(bootedSimulator.udid))").tag(bootedSimulator.id)
                         }
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
                     .padding(.bottom, 8)
+                    if !store.state.appBundles.isEmpty {
+                        Text("Select App target")
+                        Picker("", selection: Binding(
+                            get: { store.state.selectedAppBundle },
+                            set: { store.send(.appBundleSelected($0)) }
+                        )) {
+                            ForEach(store.state.appBundles, id: \.self) { bundle in
+                                Text(bundle)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .padding(.bottom, 8)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
-
-            case .appsNotDetected, .simulatorNotDetected:
+                
+            case .simulatorNotDetected:
                 ContentHeaderView(
                     titleText: "Configuration",
                     message: headerMessage(),
-                    button: .init(title: "Detect App") {
-                        store.send(.detectAppsTapped)
+                    button: .init(title: "Refresh") {
+                        store.send(.initSettingData)
                     }
                 )
-
+                
+            case .appsNotDetected:
+                ContentHeaderView(
+                    titleText: "Configuration",
+                    message: headerMessage(),
+                    button: .init(title: "Refresh") {
+                        store.send(.initSettingData)
+                    }
+                )
+                
             case .loading:
                 LoadingView()
-
+                
             case .error:
                 ContentHeaderView(
                     titleText: "Configuration",
                     message: headerMessage()
                 )
             }
-
+            
             Spacer()
         }
         .resizeToContentFrame()
         .onAppear { store.send(.onAppear) }
     }
-
+    
     private func headerMessage() -> HeaderMessageViewData? {
         if case .loading = store.state.viewState {
             return HeaderMessageViewData(

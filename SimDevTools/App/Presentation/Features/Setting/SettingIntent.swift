@@ -9,21 +9,31 @@ import Foundation
 
 enum SettingIntent: Equatable {
     case onAppear
+    case initSettingData
     
-    // simulator
-    case detectAppsTapped
+    case getBootedSimulators
+    case didSuccessGetBootedSimulators([BootedSimulator])
+    case didFailedGetBootedSimulators(SimulatorError)
+    
+    case getSavedTargetSimulator
+    case savedTargetSimulatorLoaded(String?)
+    case bootedSimulatorIDSelected(String)
+    case saveTargetSimulatorTapped
+    case saveTargetSimulatorSuccess
+    case saveTargetSimulatorSuccessFailed(SettingFeatureError)
+
     case appsFetchedSuccess([String])
     case appsFetchedFailure(SimulatorError)
 
-    // persistence
+    case clearLoadedAppBundlesAndSelectedAppBundle
+    case getAppBundlesFromSimulator
     case loadSavedAppBundle
+    case appBundleSelected(String)
     case savedAppBundleLoaded(String?)
     case saveAppBundleButtonTapped
     case saveAppBundleSuccess
     case saveAppBundleFailure(SimulatorError)
-
-    // ui
-    case appBundleSelected(String)
+    
     case clearMessage
 }
 
