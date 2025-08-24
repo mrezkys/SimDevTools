@@ -136,6 +136,7 @@ struct SettingReducer: Reducer {
                     await env.sleepMS(2_000)
                     return .clearMessage
                 },
+                Effect { .clearLoadedAppBundlesAndSelectedAppBundle },
                 Effect { .getAppBundlesFromSimulator }
             ]
         case .saveTargetSimulatorSuccessFailed(let err):
@@ -144,7 +145,6 @@ struct SettingReducer: Reducer {
         case .getAppBundlesFromSimulator:
             let targetSimulatorID = state.selectedBootedSimulatorID
             return [
-                Effect { .clearLoadedAppBundlesAndSelectedAppBundle },
                 Effect { [env] in
                     do {
                         let bundles = try await env.simulator.getAppBundleIDs(forUDID: targetSimulatorID)
