@@ -7,27 +7,7 @@
 import SwiftUI
 
 struct StorageView: View {
-    @StateObject private var store: Store<StorageFeatureReducer>
-
-    init(
-        storage: StorageFeatureStorage = UserDefaultsStorageFeatureStorage(
-            db: UserDefaultsDatabase()
-        ),
-        accessProvider: CoreSimulatorAccessProviding = CoreSimulatorAccessProvider(),
-        filesystem: CoreSimulatorFilesystem = DefaultCoreSimulatorFilesystem()
-    ) {
-        let reducer = StorageFeatureReducer.Env(
-            storage: storage,
-            accessProvider: accessProvider,
-            filesystem: filesystem
-        )
-        _store = StateObject(
-            wrappedValue: Store(
-                initial: .init(),
-                reducer: StorageFeatureReducer(env: reducer)
-            )
-        )
-    }
+    @ObservedObject var store: Store<StorageFeatureReducer>
 
     var body: some View {
         VStack {

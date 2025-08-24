@@ -7,28 +7,8 @@
 import SwiftUI
 
 struct SettingView: View {
-    @StateObject private var store: Store<SettingReducer>
-
-    init(
-        storage: SettingStorage = UserDefaultsSettingStorage(
-            db: UserDefaultsDatabase()
-        ),
-        simulator: SimulatorServiceProtocol = SimulatorService()
-    ) {
-        let reducer = SettingReducer(
-            env: .init(
-                storage: storage,
-                simulator: simulator
-            )
-        )
-        _store = StateObject(
-            wrappedValue: Store(
-                initial: .init(),
-                reducer: reducer
-            )
-        )
-    }
-
+    @ObservedObject var store: Store<SettingReducer>
+    
     var body: some View {
         VStack {
             switch store.state.viewState {
