@@ -62,16 +62,6 @@ public final class SimulatorService: SimulatorServiceProtocol {
         return keys.sorted()
     }
 
-    public func getBootedAppBundleIDs() async throws -> [String] {
-        let env = ["DEVELOPER_DIR": devDir]
-        let res = try await runner.run(simctlPath, ["listapps", "booted"], env: env)
-        if res.status != 0 { throw mapSimctlError(stderr: res.stdErr, status: res.status) }
-        let trimmed = res.stdOut.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return [] }
-        let keys = try Plist.topLevelDictionaryKeys(fromUTF8: trimmed)
-        return keys.sorted()
-    }
-
     public func getAppContainerPath(for bundleID: String) async throws -> String {
         let env = ["DEVELOPER_DIR": devDir]
         let res = try await runner.run(simctlPath, ["get_app_container", "booted", bundleID, "data"], env: env)
