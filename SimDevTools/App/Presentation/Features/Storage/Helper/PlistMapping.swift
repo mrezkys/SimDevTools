@@ -23,13 +23,18 @@ enum PlistMapping {
             switch value {
             case let s as String:
                 return (s, .string, nil)
-            case let i as Int:
-                return (String(i), .int, nil)
-            case let d as Double:
-                let s = d.rounded(.towardZero) == d ? String(Int(d)) : String(d)
-                return (s, .double, nil)
-            case let b as Bool:
-                return (b ? "true" : "false", .bool, nil)
+            case let num as NSNumber:
+                // Handle NSNumber specially - it can represent Bool, Int, or Double
+                if num === kCFBooleanTrue as NSNumber || num === kCFBooleanFalse as NSNumber {
+                    return (num.boolValue ? "true" : "false", .bool, nil)
+                } else if num.doubleValue.rounded(.towardZero) == num.doubleValue {
+                    // It's a whole number, treat as Int
+                    return (String(num.intValue), .int, nil)
+                } else {
+                    // It's a decimal, treat as Double
+                    return (String(num.doubleValue), .double, nil)
+                }
+
             case let dt as Date:
                 return (dateFormatter.string(from: dt), .date, nil)
             case let data as Data:
