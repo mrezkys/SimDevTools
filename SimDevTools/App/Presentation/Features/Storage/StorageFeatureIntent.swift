@@ -18,4 +18,9 @@ enum StorageFeatureIntent {
 
     case searchTextChanged(String)
     case clearMessage
+
+    case userToggledBoolean(key: String, newValue: Bool)
+    case saveBooleanValue(key: String, newValue: Bool)
+    case didSuccessSaveBooleanValue
+    case didErrorSaveBooleanValue(StorageFeatureError)
 }

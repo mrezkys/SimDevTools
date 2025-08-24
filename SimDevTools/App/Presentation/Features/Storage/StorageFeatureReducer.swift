@@ -108,6 +108,59 @@ struct StorageFeatureReducer: Reducer {
         case .clearMessage:
             state.message = nil
             return [.none]
+
+        case .userToggledBoolean(let key, let newValue):
+            guard !state.bundleIdentifier.isEmpty else {
+                state.message = .init(
+                    text: "You need to select an app bundle first in Configuration.",
+                    kind: .error
+                )
+                return [.none]
+            }
+            return [Effect { .saveBooleanValue(key: key, newValue: newValue) }]
+
+        case .saveBooleanValue(let key, let newValue):
+            state.message = .init(text: "Updating \(key)...", kind: .info)
+
+            let bundleId = state.bundleIdentifier
+            return [Effect { [env] in
+                do {
+                    let root = try await MainActor.run {
+                        try env.accessProvider.requestCoreSimRootIfNeeded()
+                    }
+                    guard root.startAccessingSecurityScopedResource() else {
+                        return .didErrorSaveBooleanValue(.access(.startScopedAccessFailed))
+                    }
+                    defer { root.stopAccessingSecurityScopedResource() }
+
+                    // convert Swift Bool to NSNumber for plist storage
+                    let plistValue = newValue as NSNumber
+                    try env.filesystem.writeUserDefaults(coreSimRoot: root, bundleId: bundleId, key: key, value: plistValue)
+
+                    return .didSuccessSaveBooleanValue
+
+                } catch let e as CoreSimulatorAccessError {
+                    return .didErrorSaveBooleanValue(.access(e))
+                } catch let e as CoreSimulatorFilesystemError {
+                    return .didErrorSaveBooleanValue(.fs(e))
+                } catch {
+                    return .didErrorSaveBooleanValue(.writeFailed(error.localizedDescription))
+                }
+            }]
+
+        case .didSuccessSaveBooleanValue:
+            state.message = .init(text: "Value updated successfully!", kind: .success)
+            // refresh the data to show the updated value
+            return [Effect { [state] in
+                if !state.bundleIdentifier.isEmpty {
+                    return .readSelectedAppUserDefault
+                }
+                return .none
+            }]
+
+        case .didErrorSaveBooleanValue(let err):
+            state.message = .init(text: err.message, kind: .error)
+            return [.none]
         }
     }
 }
