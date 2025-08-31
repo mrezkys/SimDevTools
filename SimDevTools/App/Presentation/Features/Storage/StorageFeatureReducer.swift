@@ -10,7 +10,6 @@ import Foundation
 struct StorageFeatureReducer: Reducer {
     struct Env {
         var storage: StorageFeatureStorage
-        var accessProvider: CoreSimulatorAccessProviding
         var filesystem: CoreSimulatorFilesystem
         var sleepMS: (_ ms: UInt64) async -> Void = { ms in try? await Task.sleep(nanoseconds: ms * 1_000_000) }
     }
@@ -59,20 +58,13 @@ struct StorageFeatureReducer: Reducer {
             let bundleId = state.bundleIdentifier
             return [Effect { [env] in
                 do {
-                    let root = try await MainActor.run {
-                        try env.accessProvider.requestCoreSimRootIfNeeded()
+                    let root = await MainActor.run {
+                        FileManager.default.homeDirectoryForCurrentUser
+                            .appendingPathComponent("Library/Developer/CoreSimulator", isDirectory: true)
                     }
-                    guard root.startAccessingSecurityScopedResource() else {
-                        return .didErrorReadSelectedAppUserDefault(.access(.startScopedAccessFailed))
-                    }
-                    defer { root.stopAccessingSecurityScopedResource() }
-
                     let dict = try env.filesystem.readUserDefaults(coreSimRoot: root, bundleId: bundleId)
                     let entries = PlistMapping.mapPlistDictToEntries(dict)
                     return .didSuccessReadSelectedAppUserDefault(entries)
-
-                } catch let e as CoreSimulatorAccessError {
-                    return .didErrorReadSelectedAppUserDefault(.access(e))
                 } catch let e as CoreSimulatorFilesystemError {
                     return .didErrorReadSelectedAppUserDefault(.fs(e))
                 } catch {
@@ -95,8 +87,6 @@ struct StorageFeatureReducer: Reducer {
             switch err {
             case .notConfigured:
                 state.viewState = .notConfigured
-            case .access(.noBookmark), .access(.staleBookmark), .access(.userCancelled):
-                state.viewState = .accessNeeded
             default:
                 state.viewState = .error
             }
@@ -125,22 +115,15 @@ struct StorageFeatureReducer: Reducer {
             let bundleId = state.bundleIdentifier
             return [Effect { [env] in
                 do {
-                    let root = try await MainActor.run {
-                        try env.accessProvider.requestCoreSimRootIfNeeded()
+                    let root = await MainActor.run {
+                        FileManager.default.homeDirectoryForCurrentUser
+                            .appendingPathComponent("Library/Developer/CoreSimulator", isDirectory: true)
                     }
-                    guard root.startAccessingSecurityScopedResource() else {
-                        return .didErrorSaveBooleanValue(.access(.startScopedAccessFailed))
-                    }
-                    defer { root.stopAccessingSecurityScopedResource() }
-
                     // convert Swift Bool to NSNumber for plist storage
                     let plistValue = newValue as NSNumber
                     try env.filesystem.writeUserDefaults(coreSimRoot: root, bundleId: bundleId, key: key, value: plistValue)
 
                     return .didSuccessSaveBooleanValue
-
-                } catch let e as CoreSimulatorAccessError {
-                    return .didErrorSaveBooleanValue(.access(e))
                 } catch let e as CoreSimulatorFilesystemError {
                     return .didErrorSaveBooleanValue(.fs(e))
                 } catch {

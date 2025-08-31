@@ -11,7 +11,6 @@ enum StorageFeatureViewState: Equatable {
     case normal
     case loading
     case notConfigured         // no bundle id saved
-    case accessNeeded          // no/stale bookmark or user cancelled
     case error                 // generic error
 }
 
@@ -29,4 +28,3 @@ struct StorageFeatureState: Equatable {
         return rawEntries.filter { $0.key.lowercased().contains(q) || $0.valueString.lowercased().contains(q) }
     }
 }
-

@@ -37,16 +37,6 @@ struct StorageView: View {
                 )
                 hint("No app bundle selected. Open Configuration and pick a target first.")
                 
-            case .accessNeeded:
-                ContentHeaderView(
-                    titleText: "Storage",
-                    message: headerMessage(),
-                    button: .init(title: "Grant Access") {
-                        store.send(.readSelectedAppUserDefault)
-                    }
-                )
-                hint("Access to ~/Library/Developer/CoreSimulator is required to read UserDefaults.")
-                
             case .error:
                 ContentHeaderView(
                     titleText: "Storage",

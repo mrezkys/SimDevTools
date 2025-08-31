@@ -22,7 +22,6 @@ struct ContentView: View {
         initial: StorageFeatureState(),
         reducer: StorageFeatureReducer(env: .init(
             storage: UserDefaultsStorageFeatureStorage(db: UserDefaultsDatabase()),
-            accessProvider: CoreSimulatorAccessProvider(),
             filesystem: DefaultCoreSimulatorFilesystem()
         ))
     )
